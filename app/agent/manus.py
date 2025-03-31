@@ -23,6 +23,7 @@ class Manus(ToolCallAgent):
     system_prompt: str = SYSTEM_PROMPT.format(directory=config.workspace_root)
     next_step_prompt: str = NEXT_STEP_PROMPT
 
+    # 最大观察长度10000字符
     max_observe: int = 10000
     max_steps: int = 20
 
@@ -45,6 +46,12 @@ class Manus(ToolCallAgent):
     async def think(self) -> bool:
         """Process current state and decide next actions with appropriate context."""
         original_prompt = self.next_step_prompt
+
+        # Only check recent messages (last 3) for browser activity
+        # 取最近三条消息
+        # 检查最近3条消息中是否包含"browser_use"关键词
+        # 如果检测到浏览器使用，临时切换为浏览器专用提示词
+        # 执行父类的思考逻辑后恢复原始提示词
         recent_messages = self.memory.messages[-3:] if self.memory.messages else []
         browser_in_use = any(
             tc.function.name == BrowserUseTool().name

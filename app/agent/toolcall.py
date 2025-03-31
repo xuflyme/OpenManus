@@ -72,6 +72,9 @@ class ToolCallAgent(ReActAgent):
                 return False
             raise
 
+        '''
+        ChatCompletionMessage(content='', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=[ChatCompletionMessageToolCall(id='call_0_596b68d3-7ade-4af7-84b0-53757c56ba87', function=Function(arguments='{"action":"web_search","query":"today AI news"}', name='browser_use'), type='function', index=0)])
+        '''
         self.tool_calls = tool_calls = (
             response.tool_calls if response and response.tool_calls else []
         )

@@ -32,7 +32,6 @@ class BaseFlow(BaseModel, ABC):
         if not primary_key and agents_dict:
             primary_key = next(iter(agents_dict))
             data["primary_agent_key"] = primary_key
-
         # Set the agents dictionary
         data["agents"] = agents_dict
 

@@ -147,9 +147,11 @@ class MCPServer:
         for tool in self.tools.values():
             self.register_tool(tool)
 
+    # McpServer启动时，会注册所有的工具
     def run(self, transport: str = "stdio") -> None:
         """Run the MCP server."""
         # Register all tools
+        # 注册工具
         self.register_all_tools()
 
         # Register cleanup function (match original behavior)

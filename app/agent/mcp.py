@@ -56,6 +56,7 @@ class MCPAgent(ToolCallAgent):
             self.connection_type = connection_type
 
         # Connect to the MCP server based on connection type
+        # 连接不同类型的MCP Server
         if self.connection_type == "sse":
             if not server_url:
                 raise ValueError("Server URL is required for SSE connection")

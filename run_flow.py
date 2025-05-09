@@ -7,6 +7,7 @@ from app.logger import logger
 
 
 async def run_flow():
+    # agent列表
     agents = {
         "manus": Manus(),
     }
@@ -18,6 +19,7 @@ async def run_flow():
             logger.warning("Empty prompt provided.")
             return
 
+        # 构建多agent，生成PlanningFlow对象
         flow = FlowFactory.create_flow(
             flow_type=FlowType.PLANNING,
             agents=agents,
@@ -27,6 +29,7 @@ async def run_flow():
         try:
             start_time = time.time()
             result = await asyncio.wait_for(
+                # 执行
                 flow.execute(prompt),
                 timeout=3600,  # 60 minute timeout for the entire execution
             )

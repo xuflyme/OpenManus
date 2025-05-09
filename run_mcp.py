@@ -7,7 +7,7 @@ from app.agent.mcp import MCPAgent
 from app.config import config
 from app.logger import logger
 
-
+# MCP 的运行流程和 Manus 的流程是一样的，只不过工具的来源是 MCP，并且 MCP 的 think 中没有了 next_step_prompt 这个 prompt
 class MCPRunner:
     """Runner class for MCP Agent with proper path handling and configuration."""
 

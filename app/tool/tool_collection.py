@@ -29,6 +29,7 @@ class ToolCollection:
         if not tool:
             return ToolFailure(error=f"Tool {name} is invalid")
         try:
+            # 触发tool的__call__方法调用
             result = await tool(**tool_input)
             return result
         except ToolError as e:

@@ -32,6 +32,7 @@ class Manus(ToolCallAgent):
     mcp_clients: MCPClients = Field(default_factory=MCPClients)
 
     # Add general-purpose tools to the tool collection
+    # Manus可用工具
     available_tools: ToolCollection = Field(
         default_factory=lambda: ToolCollection(
             PythonExecute(),
@@ -51,6 +52,11 @@ class Manus(ToolCallAgent):
     )  # server_id -> url/command
     _initialized: bool = False
 
+    # Pydantic模型验证器
+    # 在以下场景自动调用：
+    #   1. 创建新实例时 → Manus()或Manus.create()
+    #   2. 调用model_validate()方法时
+    #   3. 调用model_construct()后手动触发验证时
     @model_validator(mode="after")
     def initialize_helper(self) -> "Manus":
         """Initialize basic components synchronously."""

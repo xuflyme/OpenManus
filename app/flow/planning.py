@@ -46,6 +46,7 @@ class PlanningFlow(BaseFlow):
     """A flow that manages planning and execution of tasks using agents."""
 
     llm: LLM = Field(default_factory=lambda: LLM())
+    # planning的工具 PlanningTool
     planning_tool: PlanningTool = Field(default_factory=PlanningTool)
     executor_keys: List[str] = Field(default_factory=list)
     active_plan_id: str = Field(default_factory=lambda: f"plan_{int(time.time())}")
@@ -99,6 +100,7 @@ class PlanningFlow(BaseFlow):
 
             # Create initial plan if input provided
             if input_text:
+                # 通过大语言模型创建计划
                 await self._create_initial_plan(input_text)
 
                 # Verify plan was created successfully
@@ -119,6 +121,7 @@ class PlanningFlow(BaseFlow):
                     break
 
                 # Execute current step with appropriate agent
+                # 获取每一步的代理实例，然后执行代理。目前代理仅支持Manus
                 step_type = step_info.get("type") if step_info else None
                 executor = self.get_executor(step_type)
                 step_result = await self._execute_step(executor, step_info)
@@ -133,10 +136,12 @@ class PlanningFlow(BaseFlow):
             logger.error(f"Error in PlanningFlow: {str(e)}")
             return f"Execution failed: {str(e)}"
 
+    # 规划执行步骤
     async def _create_initial_plan(self, request: str) -> None:
         """Create an initial plan based on the request using the flow's LLM and PlanningTool."""
         logger.info(f"Creating initial plan with ID: {self.active_plan_id}")
 
+        # 系统提示词
         # Create a system message for plan creation
         system_message = Message.system_message(
             "You are a planning assistant. Create a concise, actionable plan with clear steps. "
@@ -144,6 +149,7 @@ class PlanningFlow(BaseFlow):
             "Optimize for clarity and efficiency."
         )
 
+        # 用户任务
         # Create a user message with the request
         user_message = Message.user_message(
             f"Create a reasonable plan with clear steps to accomplish the task: {request}"
@@ -157,6 +163,7 @@ class PlanningFlow(BaseFlow):
             tool_choice=ToolChoice.AUTO,
         )
 
+        # 将大模型返回内容封装为工具调用具体执行步骤
         # Process tool calls if present
         if response.tool_calls:
             for tool_call in response.tool_calls:

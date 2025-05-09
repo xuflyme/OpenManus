@@ -110,6 +110,7 @@ class BaseAgent(BaseModel, ABC):
             raise ValueError(f"Unsupported message role: {role}")
 
         # Create message with appropriate parameters based on role
+        # 创建消息，并更新到memory中
         kwargs = {"base64_image": base64_image, **(kwargs if role == "tool" else {})}
         self.memory.add_message(message_map[role](content, **kwargs))
 
@@ -128,6 +129,7 @@ class BaseAgent(BaseModel, ABC):
         if self.state != AgentState.IDLE:
             raise RuntimeError(f"Cannot run agent from state: {self.state}")
 
+        # 将用户消息加到内存中，为了后续与模型交互的记忆功能
         if request:
             self.update_memory("user", request)
 
@@ -138,14 +140,18 @@ class BaseAgent(BaseModel, ABC):
             ):
                 self.current_step += 1
                 logger.info(f"Executing step {self.current_step}/{self.max_steps}")
+                # step方法
                 step_result = await self.step()
 
-                # Check for stuck state
+                # 检测是否卡住
+                # 检测最近2次的assistant messsage内容，是否一模一样。
+                # x`如果完全一样，说明程序在运行过程中，某一步出错，陷入死循环了。每次请求LLM模型，总是输出同样的重复内容。
                 if self.is_stuck():
                     self.handle_stuck_state()
 
                 results.append(f"Step {self.current_step}: {step_result}")
 
+            # 如果超过了最大迭代次数，主动终止任务
             if self.current_step >= self.max_steps:
                 self.current_step = 0
                 self.state = AgentState.IDLE

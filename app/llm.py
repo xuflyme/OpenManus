@@ -351,6 +351,7 @@ class LLM:
 
         return formatted_messages
 
+    # 带着文本去询问大语言模型
     @retry(
         wait=wait_random_exponential(min=1, max=60),
         stop=stop_after_attempt(6),
@@ -478,6 +479,7 @@ class LLM:
             logger.exception(f"Unexpected error in ask")
             raise
 
+    # 带着文本+图片去询问大语言模型
     @retry(
         wait=wait_random_exponential(min=1, max=60),
         stop=stop_after_attempt(6),
@@ -634,6 +636,7 @@ class LLM:
             logger.error(f"Unexpected error in ask_with_images: {e}")
             raise
 
+    # 带着本地支持的工具去询问大语言模型
     @retry(
         wait=wait_random_exponential(min=1, max=60),
         stop=stop_after_attempt(6),

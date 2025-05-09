@@ -40,10 +40,12 @@ class ToolCallAgent(ReActAgent):
         """Process current state and decide next actions using tools"""
         if self.next_step_prompt:
             user_msg = Message.user_message(self.next_step_prompt)
+            # 第一次，这个Message中已经包含了user的任务content，这里再加next_step_prompt
             self.messages += [user_msg]
 
         try:
             # Get response with tool options
+            # 请求LLM决策
             response = await self.llm.ask_tool(
                 messages=self.messages,
                 system_msgs=(
@@ -51,6 +53,7 @@ class ToolCallAgent(ReActAgent):
                     if self.system_prompt
                     else None
                 ),
+                # manus agent传递5个可用工具，传递的是 List[Dict[str, Any]] 结构
                 tools=self.available_tools.to_params(),
                 tool_choice=self.tool_choices,
             )
@@ -115,6 +118,7 @@ class ToolCallAgent(ReActAgent):
             self.memory.add_message(assistant_msg)
 
             if self.tool_choices == ToolChoice.REQUIRED and not self.tool_calls:
+                logger.info(f"======> {content}")
                 return True  # Will be handled in act()
 
             # For 'auto' mode, continue with content if no commands but content exists
@@ -145,6 +149,7 @@ class ToolCallAgent(ReActAgent):
             # Reset base64_image for each tool call
             self._current_base64_image = None
 
+            # 执行工具
             result = await self.execute_tool(command)
 
             if self.max_observe:
@@ -180,6 +185,7 @@ class ToolCallAgent(ReActAgent):
             args = json.loads(command.function.arguments or "{}")
 
             # Execute the tool
+            # 执行工具
             logger.info(f"🔧 Activating tool: '{name}'...")
             result = await self.available_tools.execute(name=name, tool_input=args)
 

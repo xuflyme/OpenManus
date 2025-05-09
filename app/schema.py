@@ -51,6 +51,21 @@ class ToolCall(BaseModel):
     function: Function
 
 
+'''
+1. Message继承自pydantic.BaseModel
+2. pydantic模型会自动生成__init__方法
+3. __init__参数由模型字段自动生成：
+   def __init__(
+       self,
+       role: ROLE_TYPE,
+       content: Optional[str] = None,
+       tool_calls: Optional[List[ToolCall]] = None,
+       name: Optional[str] = None,
+       tool_call_id: Optional[str] = None,
+       base64_image: Optional[str] = None
+   )
+4. 类方法user_message调用的cls()实际使用基类BaseModel的__init__
+'''
 class Message(BaseModel):
     """Represents a chat message in the conversation"""
 

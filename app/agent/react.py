@@ -15,6 +15,9 @@ class ReActAgent(BaseAgent, ABC):
     system_prompt: Optional[str] = None
     next_step_prompt: Optional[str] = None
 
+    # 使用Pydantic的default_factory机制
+    # LLM类本身作为工厂函数，在模型实例化时会自动调用LLM的构造函数
+    # 等效于每次创建新实例时执行LLM()初始化
     llm: Optional[LLM] = Field(default_factory=LLM)
     memory: Memory = Field(default_factory=Memory)
     state: AgentState = AgentState.IDLE

@@ -101,6 +101,7 @@ class MCPClients(ToolCollection):
             raise RuntimeError(f"Session not initialized for server {server_id}")
 
         await session.initialize()
+        # 获取 MCP Server 的工具列表
         response = await session.list_tools()
 
         # Create proper tool objects for each server tool
